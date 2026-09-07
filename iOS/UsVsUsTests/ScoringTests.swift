@@ -51,7 +51,7 @@ final class ScoringTests: XCTestCase {
         let good = try JSONEncoder().encode(finished)
         for (key, value) in [("playerOneScore", NSNull()), ("playerTwoScore", NSNull()), ("finishedAt", NSNull()),
                              ("finishedAt", "99"), ("winnerPlayerID", f.pair.playerTwoID.uuidString),
-                             ("winnerPlayerID", UUID().uuidString), ("outcome", "draw")] as [(String, Any)] {
+                             ("winnerPlayerID", UUID().uuidString), ("winnerPlayerID", NSNull()), ("outcome", "draw")] as [(String, Any)] {
             var object = try XCTUnwrap(JSONSerialization.jsonObject(with: good) as? [String: Any])
             object[key] = value
             let bad = try JSONDecoder().decode(GameEvent.self, from: JSONSerialization.data(withJSONObject: object))
@@ -80,7 +80,14 @@ final class ScoringTests: XCTestCase {
         let badPair = Pair(pairID: f.pair.pairID, playerOneID: f.pair.playerOneID, playerTwoID: f.pair.playerOneID, createdAt: Timestamp(100))
         XCTAssertThrowsError(try DomainRecord.pair(badPair).validateStructure())
         XCTAssertThrowsError(try GameEvent.start(eventID: UUID(), pair: f.pair, game: other.game(), at: Timestamp(100)))
-        let event = DomainRecord.gameEvent(try f.start())
+        let start = try f.start()
+        var badSlots = try XCTUnwrap(JSONSerialization.jsonObject(with: JSONEncoder().encode(start)) as? [String: Any])
+        badSlots["playerTwoID"] = f.pair.playerOneID.uuidString
+        XCTAssertThrowsError(try JSONDecoder().decode(GameEvent.self, from: JSONSerialization.data(withJSONObject: badSlots)).validateScoresAndTimes())
+        badSlots["playerOneID"] = f.pair.playerTwoID.uuidString
+        let swapped = try JSONDecoder().decode(GameEvent.self, from: JSONSerialization.data(withJSONObject: badSlots))
+        XCTAssertThrowsError(try DomainRecord.gameEvent(swapped).validate(in: f.context))
+        let event = DomainRecord.gameEvent(start)
         var context = f.context
         context.games[f.gameID] = Game(gameID: f.gameID, pairID: other.pair.pairID, name: "Other", highScoreWins: true, isArchived: false)
         XCTAssertThrowsError(try event.validate(in: context))

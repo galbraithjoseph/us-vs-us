@@ -47,6 +47,8 @@ CloudKit sharing has an owner. Revocation, account changes, and share deletion r
 
 ## Logical data model
 
+The implemented [portable schema 1 specification and golden fixtures](portable/README.md) finalize the record encoding, validation, and revision contract. The table below remains the architectural overview.
+
 These are proposed domain objects, not a finalized Core Data schema. Every replicated entity has an application-generated UUID, created once and preserved across devices, imports, and transports. Names are display values, never identifiers.
 
 | Object | Proposed fields and purpose |

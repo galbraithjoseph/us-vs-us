@@ -1,0 +1,23 @@
+{
+  "authorPlayerID": "00000000-0000-0000-0000-000000000002",
+  "entityID": "00000000-0000-0000-0000-000000000004",
+  "entityType": "game",
+  "operation": "create",
+  "originDeviceID": "00000000-0000-0000-0000-000000000005",
+  "originSequence": "5",
+  "pairID": "00000000-0000-0000-0000-000000000001",
+  "parentRevisionIDs": [],
+  "payload": {
+    "type": "game",
+    "value": {
+      "gameID": "00000000-0000-0000-0000-000000000004",
+      "highScoreWins": true,
+      "isArchived": false,
+      "name": "Cards",
+      "pairID": "00000000-0000-0000-0000-000000000001"
+    }
+  },
+  "recordedAt": "1700000000123456",
+  "revisionID": "00000000-0000-0000-0000-000000000105",
+  "schemaVersion": 1
+}

@@ -1,0 +1,21 @@
+{
+  "authorPlayerID": "00000000-0000-0000-0000-000000000002",
+  "entityID": "00000000-0000-0000-0000-000000000002",
+  "entityType": "player",
+  "operation": "create",
+  "originDeviceID": "00000000-0000-0000-0000-000000000005",
+  "originSequence": "2",
+  "pairID": "00000000-0000-0000-0000-000000000001",
+  "parentRevisionIDs": [],
+  "payload": {
+    "type": "player",
+    "value": {
+      "displayName": "José",
+      "pairID": "00000000-0000-0000-0000-000000000001",
+      "playerID": "00000000-0000-0000-0000-000000000002"
+    }
+  },
+  "recordedAt": "1700000000123456",
+  "revisionID": "00000000-0000-0000-0000-000000000102",
+  "schemaVersion": 1
+}
