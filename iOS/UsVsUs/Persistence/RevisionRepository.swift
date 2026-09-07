@@ -4,10 +4,14 @@ import Foundation
 /// One actor and one OS directory lock serialize all local reservations/writes.
 /// A fresh epoch on every open prevents copied/rewound backups cloning a writer.
 actor RevisionRepository {
-    private let stack: StoreStack
+    let stack: StoreStack
     private let epoch: String
     private let makeUUID: @Sendable () -> UUID
     private var failure: @Sendable (WriteStage) throws -> Void = { _ in }
+    var rebuildFailure: @Sendable (RebuildStage) throws -> Void = { _ in }
+    var historyObserver: RemoteHistoryObserver?
+    var isClosed = false
+    var lastReconciliationError: String?
 
     init(directory: URL, cloudContainerIdentifier: String? = nil, makeUUID: @escaping @Sendable () -> UUID = UUID.init) throws {
         self.makeUUID = makeUUID
@@ -16,7 +20,7 @@ actor RevisionRepository {
     }
 
     func setFailureInjector(_ failure: @escaping @Sendable (WriteStage) throws -> Void) { self.failure = failure }
-    func close() throws { try stack.close() }
+    func close() throws { isClosed = true; historyObserver = nil; try stack.close() }
 
     /// Starts a new writer enrollment for this repository session and pair.
     /// Its Device create is itself durably reserved before any user revision.
@@ -49,6 +53,7 @@ actor RevisionRepository {
             return device
         }
         try deliver(operationID: device.deviceID, pair: pair)
+        _ = try processHistory()
         return device
     }
 
@@ -75,6 +80,7 @@ actor RevisionRepository {
         }
         try failure(.afterReservation)
         try deliver(operationID: command.operationID, pair: command.pair)
+        _ = try processHistory()
         return revision
     }
 
@@ -95,6 +101,7 @@ actor RevisionRepository {
             // snapshots in the log determine membership and creation time.
             try deliver(operationID: operationID, pairID: pairID)
         }
+        _ = try processHistory()
     }
 
     func revisions(in route: StoreRoute) throws -> [StoredRevision] {
@@ -131,7 +138,7 @@ actor RevisionRepository {
         guard rows.count <= 1 else { throw PersistenceError.corrupt("Duplicate reservation") }
         return rows.first
     }
-    private nonisolated func insert(_ entity: String, in context: NSManagedObjectContext, route: StoreRoute) throws -> NSManagedObject {
+    nonisolated func insert(_ entity: String, in context: NSManagedObjectContext, route: StoreRoute) throws -> NSManagedObject {
         let object = NSEntityDescription.insertNewObject(forEntityName: entity, into: context)
         context.assign(object, to: try stack.store(route))
         return object

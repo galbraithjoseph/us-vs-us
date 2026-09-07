@@ -5,7 +5,7 @@ import XCTest
 final class StoreStackTests: XCTestCase {
     func testVersionedModelMeetsMirroringConstraints() throws {
         let model = try StoreStack.model()
-        XCTAssertEqual(model.versionIdentifiers, ["1"])
+        XCTAssertEqual(model.versionIdentifiers, ["2"])
         let mirrored = try XCTUnwrap(model.entities(forConfigurationName: "Mirrored"))
         XCTAssertEqual(Set(mirrored.compactMap(\.name)), ["MirrorPair", "MirrorRevision"])
         for entity in mirrored {
@@ -19,7 +19,7 @@ final class StoreStackTests: XCTestCase {
             }
         }
         let local = try XCTUnwrap(model.entities(forConfigurationName: "Local"))
-        XCTAssertEqual(Set(local.compactMap(\.name)), ["Enrollment", "Reservation", "Projection", "SyncCursor"])
+        XCTAssertEqual(Set(local.compactMap(\.name)), ["Enrollment", "Reservation", "Projection", "SyncCursor", "Ingress", "ReconciliationState"])
         XCTAssertTrue(local.allSatisfy { $0.relationshipsByName.isEmpty })
     }
 

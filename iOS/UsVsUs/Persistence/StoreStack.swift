@@ -3,7 +3,7 @@ import CoreData
 import Darwin
 import Foundation
 
-enum StoreRoute: String, CaseIterable, Sendable { case `private`, shared, local }
+enum StoreRoute: String, CaseIterable, Codable, Sendable { case `private`, shared, local }
 enum PersistenceError: Error {
     case modelUnavailable
     case alreadyOpen
@@ -20,9 +20,10 @@ final class StoreStack: @unchecked Sendable {
     let directory: URL
     private var lockDescriptor: Int32 = -1
 
-    static func model() throws -> NSManagedObjectModel {
-        guard let url = Bundle.main.url(forResource: "UsVsUsModel", withExtension: "momd"),
-              let model = NSManagedObjectModel(contentsOf: url) else { throw PersistenceError.modelUnavailable }
+    static func model(version: String? = nil) throws -> NSManagedObjectModel {
+        guard let root = Bundle.main.url(forResource: "UsVsUsModel", withExtension: "momd") else { throw PersistenceError.modelUnavailable }
+        let url = version.map { root.appendingPathComponent("\($0).mom") } ?? root
+        guard let model = NSManagedObjectModel(contentsOf: url) else { throw PersistenceError.modelUnavailable }
         return model
     }
 
@@ -46,7 +47,7 @@ final class StoreStack: @unchecked Sendable {
             description.shouldInferMappingModelAutomatically = true
             description.setOption(["journal_mode": "WAL", "synchronous": "FULL"] as NSDictionary, forKey: NSSQLitePragmasOption)
             description.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
-            description.setOption(true as NSNumber, forKey: NSPersistentStoreRemoteChangeNotificationPostOptionKey)
+            description.setOption((route != .local) as NSNumber, forKey: NSPersistentStoreRemoteChangeNotificationPostOptionKey)
             if route != .local, let cloudContainerIdentifier {
                 let options = NSPersistentCloudKitContainerOptions(containerIdentifier: cloudContainerIdentifier)
                 options.databaseScope = route == .private ? .private : .shared

@@ -1,12 +1,12 @@
 # Core Data storage and durability
 
-The checked-in `UsVsUsModel.xcdatamodeld` contains baseline version `UsVsUsModelV1` (identifier `1`). `StoreStack` opens three SQLite stores in a caller-supplied directory. The directory must be scoped to the correct account/share lifecycle by the synchronization layer; it is not a global mixed-account database.
+The checked-in `UsVsUsModel.xcdatamodeld` retains baseline `UsVsUsModelV1` (identifier `1`) and uses `UsVsUsModelV2` (identifier `2`) for the local reconciliation inbox/snapshot/cursor additions. `StoreStack` opens three SQLite stores in a caller-supplied directory. The directory must be scoped to the correct account/share lifecycle by the synchronization layer; it is not a global mixed-account database.
 
 | File | Model configuration | Contents | Cloud mirroring |
 | --- | --- | --- | --- |
 | `private.sqlite` | Mirrored | Pair routing roots and immutable revision bytes/indices | Private scope when a real container ID is supplied |
 | `shared.sqlite` | Mirrored | Partner-owned pair roots and revision bytes/indices | Shared scope when a real container ID is supplied |
-| `local.sqlite` | Local | Enrollment epochs/counters, durable reservations/receipts, projections, sync cursors | Never enabled |
+| `local.sqlite` | Local | Enrollment epochs/counters, durable reservations/receipts, projections, sync cursors, ingress, reconciliation snapshots | Never enabled |
 
 `MirrorPair` is a routing/share root, not authority for player membership or scores. `MirrorRevision.revisionBytes` contains the complete portable envelope. Index fields are conveniences; imports must validate them against the envelope. Root/revision relationships are optional, inverse, unordered, and assigned to the same store. Local projections/bookkeeping reference UUIDs and have no cross-store relationships. The model uses optional attributes/defaults and no uniqueness constraints, following [Apple's model requirements](https://developer.apple.com/documentation/coredata/creating-a-core-data-model-for-cloudkit).
 
@@ -16,7 +16,7 @@ The stack creates `NSPersistentCloudKitContainer` store descriptions with explic
 
 `RevisionRepository` is an actor. Each operation uses private Core Data contexts and completes synchronously inside actor isolation, so another write cannot interleave a reservation. Managed objects remain within `performAndWait` context queues; only immutable portable values leave them. Per-context error merge policies surface persistence errors instead of merging business fields. An advisory OS lock prevents a second repository from opening the same directory. Close/drain the repository before opening another one or migrating its files.
 
-Call `enroll(pair:playerID:route:at:)` before new writes. It validates pair membership, creates the local enrollment and its Device-create reservation in one local save, then persists that revision to the explicit route. Logical bootstrap dependencies may arrive out of order; reconciliation validates the complete pair/player/device graph later.
+Use the recovering/observing `await RevisionRepository.open(...)` entry point, then call `enroll(pair:playerID:route:at:)` before new writes. It validates pair membership, creates the local enrollment and its Device-create reservation in one local save, then persists that revision to the explicit route. Logical bootstrap dependencies may arrive out of order; reconciliation validates the complete pair/player/device graph later.
 
 A caller creates a `WriteCommand` with a stable `operationID`. Retain that ID and the exact command until the operation finishes; a retry with changed contents under the same operation ID is rejected. New writes use this protocol:
 
@@ -30,7 +30,7 @@ No multi-store save is treated as atomic. SQLite stores use WAL with FULL synchr
 
 `recover()` replays every reservation, including acknowledged receipts. This repairs crash windows after reservation or history persistence, and handles a copied backup whose local receipt is newer than its mirrored database. It never regenerates revision IDs, writer IDs, sequence numbers, parents, or payloads during replay. It then acknowledges the local receipt. Repeating recovery does not duplicate history rows.
 
-Receipts remain indefinitely in this first implementation. Deleting them would weaken recovery across independently restored stores; compaction requires a separately designed protocol and is deferred. Replica received ranges/history tokens and projections have local-only entities reserved for reconciliation; storage does not claim to implement graph projection or transport synchronization yet.
+Receipts remain indefinitely in this first implementation. Deleting them would weaken recovery across independently restored stores; compaction requires a separately designed protocol and is deferred. Received ranges/history tokens and projections are handled by the [reconciliation layer](Reconciliation.md). Cloud transport verification is still separate.
 
 The synchronization layer must gate opening/recovery on the correct account and current share access. It must not replay a revoked partner's receipts into a newly authorized account or redirect shared data to a private store. Missing stores and load failures are errors, not requests to silently change route or erase databases.
 
