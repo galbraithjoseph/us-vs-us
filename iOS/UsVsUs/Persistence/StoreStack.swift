@@ -18,6 +18,7 @@ enum PersistenceError: Error {
 final class StoreStack: @unchecked Sendable {
     let container: NSPersistentCloudKitContainer
     let directory: URL
+    let cloudEnabled: Bool
     private var lockDescriptor: Int32 = -1
 
     static func model(version: String? = nil) throws -> NSManagedObjectModel {
@@ -29,6 +30,7 @@ final class StoreStack: @unchecked Sendable {
 
     init(directory: URL, cloudContainerIdentifier: String? = nil) throws {
         self.directory = directory
+        cloudEnabled = cloudContainerIdentifier != nil
         let model = try Self.model()
         container = NSPersistentCloudKitContainer(name: "UsVsUsModel", managedObjectModel: model)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)

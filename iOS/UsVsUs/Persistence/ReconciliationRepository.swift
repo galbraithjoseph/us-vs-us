@@ -187,11 +187,7 @@ extension RevisionRepository {
                     return
                 }
             }
-            let roots = NSFetchRequest<NSManagedObject>(entityName: "MirrorPair")
-            roots.affectedStores = [store]
-            roots.predicate = NSPredicate(format: "pairID == %@", revision.pairID as NSUUID)
-            let root = try context.fetch(roots).first ?? insert("MirrorPair", in: context, route: route)
-            root.setValue(revision.pairID, forKey: "pairID")
+            let root = try revisionRoot(pairID: revision.pairID, route: route, in: context)
             let row = try insert("MirrorRevision", in: context, route: route)
             row.setValue(revision.revisionID, forKey: "revisionID")
             row.setValue(revision.pairID, forKey: "pairID")

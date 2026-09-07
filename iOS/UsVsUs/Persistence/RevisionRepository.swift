@@ -202,11 +202,7 @@ actor RevisionRepository {
                 guard match.value(forKey: "revisionBytes") as? Data == bytes else { throw PersistenceError.corrupt("Conflicting revision identity") }
             }
             if matches.isEmpty {
-                let roots = NSFetchRequest<NSManagedObject>(entityName: "MirrorPair")
-                roots.affectedStores = [store]
-                roots.predicate = NSPredicate(format: "pairID == %@", pairID as NSUUID)
-                let root = try mirrored.fetch(roots).first ?? insert("MirrorPair", in: mirrored, route: route)
-                root.setValue(pairID, forKey: "pairID")
+                let root = try revisionRoot(pairID: pairID, route: route, in: mirrored)
                 let row = try insert("MirrorRevision", in: mirrored, route: route)
                 row.setValue(revision.revisionID, forKey: "revisionID")
                 row.setValue(pairID, forKey: "pairID")

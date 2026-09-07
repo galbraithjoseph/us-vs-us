@@ -72,3 +72,5 @@ xcrun simctl launch "$SIMULATOR_ID" com.galbraiths.joseph1970.usvsus
 Debug UI-test launches pass `--ui-testing`. Every launch receives a new in-memory preference store, fixed time/UUID generators, and unavailable-cloud status. `--fixture-help-hidden` seeds a non-default preference. Removing that flag restores the empty fixture on the next launch. Tests never reset or read production preferences. Release builds ignore both flags.
 
 The unit suite verifies injected services, preference persistence across recreation, and independent fixture launches. UI smoke tests navigate Home/Settings, change a preference, terminate/relaunch, and compare seeded/empty launches to verify isolation. Run UI tests twice to verify independent test invocations. Real CloudKit/account/device checks remain required in the relevant later issues; these fixtures do not provide cloud validation.
+
+CloudKit development provisioning, sharing boundaries, device harness, and the pending real-account acceptance matrix are documented in [CloudKit.md](Documentation/CloudKit.md).
