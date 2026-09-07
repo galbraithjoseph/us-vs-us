@@ -2,12 +2,24 @@ import SwiftUI
 
 @main
 struct UsVsUsApp: App {
+    #if DEBUG
+    @UIApplicationDelegateAdaptor(CloudApplicationDelegate.self) private var appDelegate
+    #endif
     @State private var model = ShellModel(
         dependencies: .forLaunch(arguments: ProcessInfo.processInfo.arguments)
     )
 
     var body: some Scene {
-        WindowGroup { ShellView(model: model) }
+        WindowGroup {
+            #if DEBUG
+            if !ProcessInfo.processInfo.arguments.contains("--ui-testing") &&
+                (ProcessInfo.processInfo.arguments.contains("--cloudkit-harness") || CloudInvitationInbox.shared.metadata != nil) {
+                CloudHarnessView()
+            } else { ShellView(model: model) }
+            #else
+            ShellView(model: model)
+            #endif
+        }
     }
 }
 
