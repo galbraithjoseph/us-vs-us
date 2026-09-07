@@ -29,6 +29,7 @@ actor RevisionRepository {
             if let row = try enrollment(pairID: pair.pairID, in: context) {
                 try require(row.value(forKey: "playerID") as? UUID == playerID, "Writer cannot switch player")
                 guard let id = row.value(forKey: "deviceID") as? UUID, let created = row.value(forKey: "createdAt") as? Int64 else { throw PersistenceError.corrupt("Enrollment") }
+                guard try reservation(id, in: context)?.value(forKey: "route") as? String == route.rawValue else { throw PersistenceError.operationMismatch }
                 return Device(deviceID: id, pairID: pair.pairID, playerID: playerID, createdAt: Timestamp(created), displayLabel: nil)
             }
             let device = Device(deviceID: makeUUID(), pairID: pair.pairID, playerID: playerID, createdAt: time, displayLabel: nil)
@@ -65,7 +66,9 @@ actor RevisionRepository {
                 return stored
             }
             guard let enrollment = try enrollment(pairID: command.pair.pairID, in: context) else { throw PersistenceError.corrupt("Enroll before writing") }
-            guard enrollment.value(forKey: "playerID") as? UUID == command.authorPlayerID else { throw PersistenceError.operationMismatch }
+            guard enrollment.value(forKey: "playerID") as? UUID == command.authorPlayerID,
+                  let deviceID = enrollment.value(forKey: "deviceID") as? UUID,
+                  try reservation(deviceID, in: context)?.value(forKey: "route") as? String == command.route.rawValue else { throw PersistenceError.operationMismatch }
             let revision = try reserve(command, enrollment: enrollment, in: context)
             try context.save() // Only Local configuration objects are dirty here.
             return revision

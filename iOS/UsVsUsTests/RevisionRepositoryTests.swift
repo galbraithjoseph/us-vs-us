@@ -148,6 +148,11 @@ final class RevisionRepositoryTests: XCTestCase {
         let input = command(f)
         let revision = try await repository.write(input)
         XCTAssertEqual(revision.originSequence.rawValue, 2)
+        do {
+            _ = try await repository.enroll(pair: f.pair, playerID: f.pair.playerOneID, route: .shared, at: Timestamp(102))
+            XCTFail("An enrollment must not silently switch stores")
+        } catch PersistenceError.operationMismatch { }
+        do { _ = try await repository.write(command(f, route: .shared)); XCTFail("Expected wrong route rejection") } catch PersistenceError.operationMismatch { }
         let changed = command(f, id: input.operationID, route: .shared)
         do { _ = try await repository.write(changed); XCTFail("Expected operation mismatch") } catch PersistenceError.operationMismatch { }
         try await repository.close()
