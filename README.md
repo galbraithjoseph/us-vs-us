@@ -2,7 +2,7 @@
 
 A paired scorekeeping app for tracking lifetime game wins between two people.
 
-Us vs Us is the working app name. The proposed implementation is Apple-first: **SwiftUI + Core Data + iCloud/CloudKit**, with possible later peer-to-peer Android interoperability. The repository includes a runnable SwiftUI app shell and local unit/UI tests under `iOS/`; persistence, sharing, and scorekeeping are tracked in the implementation issues. See [iOS setup and local validation](iOS/README.md).
+Us vs Us is the working app name. The proposed implementation is Apple-first: **SwiftUI + Core Data + iCloud/CloudKit**, with possible later peer-to-peer Android interoperability. The repository includes a runnable SwiftUI app shell and local unit/UI tests under `iOS/`; portable domain validation and crash-safe Core Data repositories are implemented; sharing and scorekeeping screens are tracked in the implementation issues. See [iOS setup and local validation](iOS/README.md).
 
 ## Repository layout
 

@@ -1,6 +1,6 @@
 # Us vs Us for iOS
 
-Open `UsVsUs.xcodeproj` and select the checked-in **UsVsUs** shared scheme. The current shell has Home and Settings screens, a locally saved setup-help preference, and deterministic unit/UI test entry points. Pairing, game data, Core Data, and CloudKit arrive in later tracked issues.
+Open `UsVsUs.xcodeproj` and select the checked-in **UsVsUs** shared scheme. The current shell has Home and Settings screens, a locally saved setup-help preference, and deterministic unit/UI test entry points. The domain schema and Core Data repositories are implemented beneath the shell; pairing, feature screens, and CloudKit sharing remain tracked work. See [storage and crash recovery](Documentation/Persistence.md) and the [portable schema](../portable/README.md).
 
 ## Supported environment
 
@@ -67,7 +67,7 @@ xcrun simctl launch "$SIMULATOR_ID" com.galbraiths.joseph1970.usvsus
 
 ## Dependencies and test isolation
 
-`AppDependencies` injects shell persistence, time, UUID generation, and cloud status. The live shell stores only its setup-help preference in UserDefaults; this is not a substitute for the forthcoming Core Data domain store. Cloud status truthfully reports that sharing is not configured.
+`AppDependencies` injects shell persistence, time, UUID generation, and cloud status. The live shell stores only its setup-help preference in UserDefaults; this is not a substitute for the Core Data domain store. Cloud status truthfully reports that sharing is not configured.
 
 Debug UI-test launches pass `--ui-testing`. Every launch receives a new in-memory preference store, fixed time/UUID generators, and unavailable-cloud status. `--fixture-help-hidden` seeds a non-default preference. Removing that flag restores the empty fixture on the next launch. Tests never reset or read production preferences. Release builds ignore both flags.
 
