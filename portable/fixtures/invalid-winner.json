@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "revisionID": "00000000-0000-0000-0000-000000000107",
+  "pairID": "00000000-0000-0000-0000-000000000001",
+  "entityType": "gameEvent",
+  "entityID": "00000000-0000-0000-0000-000000000006",
+  "originDeviceID": "00000000-0000-0000-0000-000000000005",
+  "originSequence": "7",
+  "authorPlayerID": "00000000-0000-0000-0000-000000000002",
+  "recordedAt": "1700000000123456",
+  "parentRevisionIDs": [
+    "00000000-0000-0000-0000-000000000106"
+  ],
+  "operation": "update",
+  "payload": {
+    "type": "gameEvent",
+    "value": {
+      "eventID": "00000000-0000-0000-0000-000000000006",
+      "pairID": "00000000-0000-0000-0000-000000000001",
+      "gameID": "00000000-0000-0000-0000-000000000004",
+      "playerOneID": "00000000-0000-0000-0000-000000000002",
+      "playerTwoID": "00000000-0000-0000-0000-000000000003",
+      "startedAt": "1700000000123456",
+      "highScoreWinsAtStart": true,
+      "status": "completed",
+      "outcome": "win",
+      "finishedAt": "1700000001123457",
+      "playerOneScore": "9223372036854775807",
+      "playerTwoScore": "-9223372036854775808",
+      "winnerPlayerID": "00000000-0000-0000-0000-000000000003"
+    }
+  }
+}

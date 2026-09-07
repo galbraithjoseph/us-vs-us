@@ -1,5 +1,7 @@
 // !$*UTF8*$!
 { archiveVersion = 1; classes = {}; objectVersion = 77; objects = {
+14085D9BDE13D5D1C33179D5 = { isa = PBXFileReference; lastKnownFileType = folder; path = ../portable/fixtures; sourceTree = "<group>"; };
+9283487B738DD35A543D2273 = { isa = PBXBuildFile; fileRef = 14085D9BDE13D5D1C33179D5; };
 8500A105EFC3753A5CE8987E = { isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Configuration/Shared.xcconfig; sourceTree = "<group>"; };
 E9325156D811314F506731F7 = { isa = PBXFileSystemSynchronizedRootGroup; path = UsVsUs; sourceTree = "<group>"; };
 8FD0BF0EC0B3268BCBC10D68 = { isa = PBXFileReference; explicitFileType = wrapper.application; path = UsVsUs.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -14,7 +16,7 @@ E18A223C65380AD0F5EFFF09 = { isa = PBXNativeTarget; buildConfigurationList = DB8
 8238147383D27293106FAB42 = { isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = UsVsUsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 9FE9F89B22F1D6A9B7E849B3 = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 8D3FF94935878A45811B80A4 = { isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
-1DDD6C4EF40DA2F0E6B4B5C5 = { isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+1DDD6C4EF40DA2F0E6B4B5C5 = { isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (9283487B738DD35A543D2273,); runOnlyForDeploymentPostprocessing = 0; };
 E8FA430074A1F2EC8BFCDDE2 = { isa = XCBuildConfiguration; baseConfigurationReference = 8500A105EFC3753A5CE8987E; buildSettings = { PRODUCT_NAME = "$(TARGET_NAME)"; PRODUCT_BUNDLE_IDENTIFIER = com.galbraiths.joseph1970.usvsus.UsVsUsTests; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/UsVsUs.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/UsVsUs"; BUNDLE_LOADER = "$(TEST_HOST)";  }; name = Debug; };
 FA280EB9C4074EA8C626F902 = { isa = XCBuildConfiguration; baseConfigurationReference = 8500A105EFC3753A5CE8987E; buildSettings = { PRODUCT_NAME = "$(TARGET_NAME)"; PRODUCT_BUNDLE_IDENTIFIER = com.galbraiths.joseph1970.usvsus.UsVsUsTests; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/UsVsUs.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/UsVsUs"; BUNDLE_LOADER = "$(TEST_HOST)";  }; name = Release; };
 70415F69D0328944F05271BC = { isa = XCConfigurationList; buildConfigurations = (E8FA430074A1F2EC8BFCDDE2,FA280EB9C4074EA8C626F902,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
@@ -33,7 +35,7 @@ EBDF89C4590FA1ABC3B0E52F = { isa = PBXResourcesBuildPhase; buildActionMask = 214
 BCF31BF434CB7085C9E53D22 = { isa = PBXTargetDependency; target = E18A223C65380AD0F5EFFF09; targetProxy = 8A89F898C8B15AC91009B6F7; };
 CE87256C0D3AAE4456E5F2E7 = { isa = PBXNativeTarget; buildConfigurationList = 7ECC1E15E36B787CEB00E18D; buildPhases = (48ED209EA36450911116B864,1F1E99EF1543388ED8E4F03B,EBDF89C4590FA1ABC3B0E52F,); buildRules = (); dependencies = (BCF31BF434CB7085C9E53D22,); fileSystemSynchronizedGroups = (F88B7FF408A7457260EFCE6A,); name = UsVsUsUITests; productName = UsVsUsUITests; productReference = F5D164C415E8145453F51C06; productType = "com.apple.product-type.bundle.ui-testing"; };
 0A3E27B8CA818264D75C8D81 = { isa = PBXGroup; children = (8FD0BF0EC0B3268BCBC10D68,8238147383D27293106FAB42,F5D164C415E8145453F51C06,); name = Products; sourceTree = "<group>"; };
-4813494D137E1631BBA301D5 = { isa = PBXGroup; children = (E9325156D811314F506731F7,1B5E9D4D95591885FE6C877D,F88B7FF408A7457260EFCE6A,8500A105EFC3753A5CE8987E,0A3E27B8CA818264D75C8D81,); sourceTree = "<group>"; };
+4813494D137E1631BBA301D5 = { isa = PBXGroup; children = (14085D9BDE13D5D1C33179D5,E9325156D811314F506731F7,1B5E9D4D95591885FE6C877D,F88B7FF408A7457260EFCE6A,8500A105EFC3753A5CE8987E,0A3E27B8CA818264D75C8D81,); sourceTree = "<group>"; };
 73EBF6644258C120893E685D = { isa = XCBuildConfiguration; buildSettings = { SDKROOT = iphoneos; CLANG_ENABLE_MODULES = YES; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; ENABLE_TESTABILITY = YES; DEBUG_INFORMATION_FORMAT = dwarf; SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG; }; name = Debug; };
 0B0C687DF8B6B8DC790B519C = { isa = XCBuildConfiguration; buildSettings = { SDKROOT = iphoneos; CLANG_ENABLE_MODULES = YES; SWIFT_OPTIMIZATION_LEVEL = "-O"; DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym"; }; name = Release; };
 76F8DEC3DFE0BDB465198890 = { isa = XCConfigurationList; buildConfigurations = (73EBF6644258C120893E685D,0B0C687DF8B6B8DC790B519C,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };

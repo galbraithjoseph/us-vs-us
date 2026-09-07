@@ -1,0 +1,27 @@
+{
+  "authorPlayerID": "00000000-0000-0000-0000-000000000002",
+  "entityID": "00000000-0000-0000-0000-000000000006",
+  "entityType": "gameEvent",
+  "operation": "create",
+  "originDeviceID": "00000000-0000-0000-0000-000000000005",
+  "originSequence": "6",
+  "pairID": "00000000-0000-0000-0000-000000000001",
+  "parentRevisionIDs": [],
+  "payload": {
+    "type": "gameEvent",
+    "value": {
+      "eventID": "00000000-0000-0000-0000-000000000006",
+      "gameID": "00000000-0000-0000-0000-000000000004",
+      "highScoreWinsAtStart": true,
+      "outcome": "none",
+      "pairID": "00000000-0000-0000-0000-000000000001",
+      "playerOneID": "00000000-0000-0000-0000-000000000002",
+      "playerTwoID": "00000000-0000-0000-0000-000000000003",
+      "startedAt": "1700000000123456",
+      "status": "inProgress"
+    }
+  },
+  "recordedAt": "1700000000123456",
+  "revisionID": "00000000-0000-0000-0000-000000000106",
+  "schemaVersion": 1
+}

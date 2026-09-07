@@ -1,0 +1,23 @@
+{
+  "authorPlayerID": "00000000-0000-0000-0000-000000000002",
+  "entityID": "00000000-0000-0000-0000-000000000005",
+  "entityType": "device",
+  "operation": "create",
+  "originDeviceID": "00000000-0000-0000-0000-000000000005",
+  "originSequence": "4",
+  "pairID": "00000000-0000-0000-0000-000000000001",
+  "parentRevisionIDs": [],
+  "payload": {
+    "type": "device",
+    "value": {
+      "createdAt": "1700000000123456",
+      "deviceID": "00000000-0000-0000-0000-000000000005",
+      "displayLabel": "Phone",
+      "pairID": "00000000-0000-0000-0000-000000000001",
+      "playerID": "00000000-0000-0000-0000-000000000002"
+    }
+  },
+  "recordedAt": "1700000000123456",
+  "revisionID": "00000000-0000-0000-0000-000000000104",
+  "schemaVersion": 1
+}
