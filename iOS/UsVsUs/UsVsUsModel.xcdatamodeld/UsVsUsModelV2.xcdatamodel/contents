@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='utf-8'?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="27000" systemVersion="25A" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="2">
+    <entity name="MirrorPair" representedClassName="NSManagedObject" syncable="YES">
+        <attribute name="pairID" optional="YES" attributeType="UUID" />
+        <attribute name="createdAt" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" />
+        <relationship name="revisions" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="MirrorRevision" inverseName="root" inverseEntity="MirrorRevision" />
+    </entity>
+    <entity name="MirrorRevision" representedClassName="NSManagedObject" syncable="YES">
+        <attribute name="revisionID" optional="YES" attributeType="UUID" />
+        <attribute name="pairID" optional="YES" attributeType="UUID" />
+        <attribute name="entityID" optional="YES" attributeType="UUID" />
+        <attribute name="entityType" optional="YES" attributeType="String" />
+        <attribute name="originDeviceID" optional="YES" attributeType="UUID" />
+        <attribute name="originSequence" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" />
+        <attribute name="revisionBytes" optional="YES" attributeType="Binary" />
+        <relationship name="root" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="MirrorPair" inverseName="revisions" inverseEntity="MirrorPair" />
+    </entity>
+    <entity name="Enrollment" representedClassName="NSManagedObject" syncable="YES">
+        <attribute name="pairID" optional="YES" attributeType="UUID" />
+        <attribute name="playerID" optional="YES" attributeType="UUID" />
+        <attribute name="deviceID" optional="YES" attributeType="UUID" />
+        <attribute name="installationToken" optional="YES" attributeType="String" />
+        <attribute name="nextSequence" optional="YES" attributeType="Integer 64" defaultValueString="1" usesScalarValueType="YES" />
+        <attribute name="createdAt" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" />
+    </entity>
+    <entity name="Reservation" representedClassName="NSManagedObject" syncable="YES">
+        <attribute name="operationID" optional="YES" attributeType="UUID" />
+        <attribute name="revisionID" optional="YES" attributeType="UUID" />
+        <attribute name="pairID" optional="YES" attributeType="UUID" />
+        <attribute name="revisionBytes" optional="YES" attributeType="Binary" />
+        <attribute name="route" optional="YES" attributeType="String" />
+        <attribute name="acknowledged" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" />
+    </entity>
+    <entity name="Projection" representedClassName="NSManagedObject" syncable="YES">
+        <attribute name="pairID" optional="YES" attributeType="UUID" />
+        <attribute name="entityID" optional="YES" attributeType="UUID" />
+        <attribute name="entityType" optional="YES" attributeType="String" />
+        <attribute name="snapshotBytes" optional="YES" attributeType="Binary" />
+        <attribute name="state" optional="YES" attributeType="String" />
+    </entity>
+    <entity name="SyncCursor" representedClassName="NSManagedObject" syncable="YES">
+        <attribute name="pairID" optional="YES" attributeType="UUID" />
+        <attribute name="originDeviceID" optional="YES" attributeType="UUID" />
+        <attribute name="receivedRanges" optional="YES" attributeType="Binary" />
+        <attribute name="historyToken" optional="YES" attributeType="Binary" />
+        <attribute name="scope" optional="YES" attributeType="String" />
+    </entity>
+    <configuration name="Mirrored">
+        <memberEntity name="MirrorPair" />
+        <memberEntity name="MirrorRevision" />
+    </configuration>
+    <configuration name="Local">
+        <memberEntity name="Enrollment" />
+        <memberEntity name="Reservation" />
+        <memberEntity name="Projection" />
+        <memberEntity name="SyncCursor" />
+        <memberEntity name="Ingress" />
+        <memberEntity name="ReconciliationState" />
+    </configuration>
+    <entity name="Ingress" representedClassName="NSManagedObject" syncable="YES">
+        <attribute name="pairID" optional="YES" attributeType="UUID" />
+        <attribute name="route" optional="YES" attributeType="String" />
+        <attribute name="bytes" optional="YES" attributeType="Binary" />
+    </entity>
+    <entity name="ReconciliationState" representedClassName="NSManagedObject" syncable="YES">
+        <attribute name="key" optional="YES" attributeType="String" />
+        <attribute name="snapshotBytes" optional="YES" attributeType="Binary" />
+    </entity>
+</model>

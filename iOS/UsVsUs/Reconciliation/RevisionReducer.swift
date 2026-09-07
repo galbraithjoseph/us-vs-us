@@ -19,6 +19,7 @@ struct ScoreboardTotal: Codable, Equatable, Sendable {
 }
 struct ReconciliationSnapshot: Codable, Equatable, Sendable {
     let projections: [EntityProjection]
+    let routingIncomplete: Bool
     let totals: [ScoreboardTotal]
     let ranges: [OriginRanges]
     let quarantined: [QuarantinedInput]
@@ -28,7 +29,7 @@ struct ReconciliationSnapshot: Codable, Equatable, Sendable {
 enum RevisionReducer {
     private enum NodeStatus { case valid, pending, invalid }
 
-    static func rebuild(_ inputs: [RoutedInput]) -> ReconciliationSnapshot {
+    static func rebuild(_ inputs: [RoutedInput], routingIncomplete: Bool = false) -> ReconciliationSnapshot {
         let ingested = RevisionIngestion.ingest(inputs)
         let records = ingested.records
         let states = graphStates(records)
@@ -53,7 +54,7 @@ enum RevisionReducer {
             let status: ProjectionStatus
             if unsupportedPairs.contains(key.pairID) { status = .unsupported }
             else if ingested.poisonedRecords.contains(key) || revisions.contains(where: { states[$0.revisionID] == .invalid || invalidWriters.contains($0.revisionID) }) { status = .quarantined }
-            else if missingWriters.contains(key) || revisions.contains(where: { states[$0.revisionID] == .pending }) || heads.isEmpty { status = .pending }
+            else if routingIncomplete || missingWriters.contains(key) || revisions.contains(where: { states[$0.revisionID] == .pending }) || heads.isEmpty { status = .pending }
             else if heads.count > 1 { status = .conflict }
             else if heads[0].operation == .void { status = .voided }
             else { status = .ready }
@@ -89,7 +90,7 @@ enum RevisionReducer {
             }
         }
         quarantine.sort { $0.input.sortKey + $0.reason < $1.input.sortKey + $1.reason }
-        return ReconciliationSnapshot(projections: projections, totals: totals(projections), ranges: ingested.ranges,
+        return ReconciliationSnapshot(projections: projections, routingIncomplete: routingIncomplete, totals: totals(projections), ranges: ingested.ranges,
                                       quarantined: quarantine, unsupported: ingested.unsupported)
     }
 
