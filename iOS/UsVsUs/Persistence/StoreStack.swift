@@ -3,7 +3,7 @@ import CoreData
 import Darwin
 import Foundation
 
-enum StoreRoute: String, CaseIterable, Sendable { case `private`, shared, local }
+enum StoreRoute: String, CaseIterable, Codable, Sendable { case `private`, shared, local }
 enum PersistenceError: Error {
     case modelUnavailable
     case alreadyOpen
