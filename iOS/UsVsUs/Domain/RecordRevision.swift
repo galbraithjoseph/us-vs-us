@@ -57,12 +57,16 @@ struct RecordRevision: Codable, Equatable, Sendable {
     }
 
     func validateReferences(in context: DomainContext) throws {
+        try validateWriter(in: context)
+        try payload?.validate(in: context)
+    }
+
+    func validateWriter(in context: DomainContext) throws {
         try validateStructure()
         let pair = try context.pair(pairID)
         try context.player(authorPlayerID, in: pair)
         guard let device = context.devices[originDeviceID] else { throw DomainError.missingDependency(originDeviceID) }
         try require(device.deviceID == originDeviceID && device.pairID == pairID && device.playerID == authorPlayerID, "Writer does not belong to the author/pair")
-        try payload?.validate(in: context)
         // These UUID relationships validate data consistency, not transport authorization.
     }
 }
