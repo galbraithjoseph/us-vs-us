@@ -153,14 +153,14 @@ final class CloudKitSharingTransport: PairShareTransport {
         // temporary ID is used only for metadata shape checks, never enrollment.
         try SharingPolicy.validate(snapshot(metadata.share, pairID: UUID(), route: .shared))
         try await checkAccount()
-        if metadata.participantStatus != .accepted {
-            let store = try stack.store(.shared)
-            let _: Void = try await withCheckedThrowingContinuation { continuation in
-                stack.container.acceptShareInvitations(from: [metadata], into: store) { accepted, error in
-                    if let error { continuation.resume(throwing: error) }
-                    else if accepted?.count == 1 { continuation.resume() }
-                    else { continuation.resume(throwing: SharingError.incompleteResponse) }
-                }
+        // Let Core Data register the zone on this device even when the account
+        // already accepted on another device. The CloudKit acceptance is idempotent.
+        let store = try stack.store(.shared)
+        let _: Void = try await withCheckedThrowingContinuation { continuation in
+            stack.container.acceptShareInvitations(from: [metadata], into: store) { accepted, error in
+                if let error { continuation.resume(throwing: error) }
+                else if accepted?.count == 1 { continuation.resume() }
+                else { continuation.resume(throwing: SharingError.incompleteResponse) }
             }
         }
         try await checkAccount()

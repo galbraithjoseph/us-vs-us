@@ -59,6 +59,7 @@ final class CloudHarnessModel {
 
     func connect() async throws {
         guard repository == nil else { return }
+        UIApplication.shared.registerForRemoteNotifications()
         let account = try await accounts.currentAccount()
         self.account = account
         let base = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
@@ -134,6 +135,7 @@ final class CloudHarnessModel {
     }
     func verifyMembership() async throws {
         guard let sharing, let repository, let pair = pairs.first(where: { $0.pairID == selectedPairID }) else { throw SharingError.missingPair }
+        writers.removeValue(forKey: pair.pairID)
         let binding = try await sharing.binding(for: pair)
         writers[pair.pairID] = try AuthorizedPairWriter(pair: pair, binding: binding, accounts: accounts, repository: repository)
         status = "Verified \(binding.route.rawValue) player \(binding.playerID). Offline writes enabled for this session."
@@ -150,7 +152,7 @@ final class CloudHarnessModel {
         try await refresh()
     }
     func refresh() async throws {
-        guard let repository else { return }
+        guard let repository, let account else { return }
         let snapshot = try await repository.processHistory()
         pairs = snapshot.projections.compactMap { projection in
             guard projection.status == .ready, case .pair(let pair) = projection.record else { return nil }
@@ -160,7 +162,7 @@ final class CloudHarnessModel {
         var lines = ["Us vs Us development CloudKit report", "Generated: \(Date().ISO8601Format())",
                      "Device: \(UIDevice.current.model), \(UIDevice.current.systemName) \(UIDevice.current.systemVersion)",
                      "Container: \(CloudConfiguration.containerIdentifier)", "Team: \(CloudConfiguration.teamIdentifier)",
-                     "Account directory: \(CloudKitAccountService.directory(under: URL(fileURLWithPath: "/"), account: account!).lastPathComponent)",
+                     "Account directory: \(CloudKitAccountService.directory(under: URL(fileURLWithPath: "/"), account: account).lastPathComponent)",
                      "Routing incomplete: \(snapshot.routingIncomplete)", "Quarantine: \(snapshot.quarantined.count)"]
         for pair in pairs { lines.append("PAIR \(pair.pairID) PLAYER_ONE \(pair.playerOneID) PLAYER_TWO \(pair.playerTwoID)") }
         for route in [StoreRoute.private, .shared] {

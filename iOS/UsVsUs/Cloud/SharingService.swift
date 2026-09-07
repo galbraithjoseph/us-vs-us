@@ -49,10 +49,13 @@ final class SharingService {
         guard recipient != account else { throw SharingError.selfInvitation }
         try await checkAccount()
         let share = try await transport.share(pairID: pairID, create: true)
+        guard share.pairID == pairID else { throw SharingError.invalidShare }
         try SharingPolicy.invite(recipient, by: account, to: share)
         try await checkAccount()
         let updated = try await transport.invite(recipient: recipient, share: share)
         try SharingPolicy.invite(recipient, by: account, to: updated)
+        guard updated.pairID == pairID, updated.identifier == share.identifier,
+              updated.members.contains(where: { $0.account == recipient }) else { throw SharingError.incompleteResponse }
         try await checkAccount()
         return updated
     }
@@ -61,10 +64,14 @@ final class SharingService {
         try await begin()
         defer { busy = false }
         let share = try await transport.share(pairID: pairID, create: false)
+        guard share.pairID == pairID else { throw SharingError.invalidShare }
         try SharingPolicy.cancel(by: account, share: share)
         try await checkAccount()
         let updated = try await transport.cancelPending(share: share)
         try SharingPolicy.validate(updated)
+        guard updated.pairID == pairID, updated.identifier == share.identifier, updated.members.count == 1 else {
+            throw SharingError.incompleteResponse
+        }
         try await checkAccount()
         return updated
     }

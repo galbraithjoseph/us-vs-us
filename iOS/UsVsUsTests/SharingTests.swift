@@ -47,14 +47,21 @@ final class SharingTests: XCTestCase {
         let first = try await service.invite(pairID: pair.pairID, email: "partner@example.invalid")
         let repeated = try await service.invite(pairID: pair.pairID, email: "partner@example.invalid")
         XCTAssertEqual(first, repeated)
-        transport.fail = true
-        do { _ = try await service.cancelPending(pairID: pair.pairID); XCTFail() } catch ShareDouble.Failure.temporary { }
-        transport.fail = false
-        _ = try await service.cancelPending(pairID: pair.pairID)
-        XCTAssertEqual(transport.cancellations, 1)
         transport.recipient = third
         do { _ = try await service.invite(pairID: pair.pairID, email: "third@example.invalid"); XCTFail() } catch SharingError.thirdParticipant { }
         XCTAssertEqual(transport.invitations, 2)
+        transport.fail = true
+        do { _ = try await service.cancelPending(pairID: pair.pairID); XCTFail() } catch ShareDouble.Failure.temporary { }
+        transport.fail = false
+        let canceled = try await service.cancelPending(pairID: pair.pairID)
+        let repeatedCancel = try await service.cancelPending(pairID: pair.pairID)
+        XCTAssertEqual(canceled, repeatedCancel)
+        XCTAssertEqual(canceled.members.count, 1)
+        transport.recipient = partner
+        let reinvited = try await service.invite(pairID: pair.pairID, email: "partner@example.invalid")
+        XCTAssertEqual(reinvited.members.count, 2)
+        XCTAssertEqual(transport.cancellations, 2)
+
     }
 
     func testAcceptanceFailurePendingImportAndRepeatedAcceptance() async throws {
@@ -88,6 +95,34 @@ final class SharingTests: XCTestCase {
         _ = try await service.invite(pairID: pair.pairID, email: "partner@example.invalid")
         XCTAssertEqual(transport.invitations, 1)
     }
+    func testVerifiedWriterPreservesIdentityAndStopsOnAccountChange() async throws {
+        let path = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: path) }
+        let repository = try RevisionRepository(directory: path)
+        let accounts = AccountDouble(partner)
+        let binding = try SharingPolicy.bind(pair: pair, share: share(route: .shared), account: partner)
+        let writer = try AuthorizedPairWriter(pair: pair, binding: binding, accounts: accounts, repository: repository)
+        let game = Game(gameID: UUID(), pairID: pair.pairID, name: "Offline probe", highScoreWins: true, isArchived: false)
+        let operationID = UUID()
+        let first = try await writer.write(operationID: operationID, record: .game(game), entityType: .game,
+                                           entityID: game.gameID, operation: .create, at: Timestamp(100))
+        let repeated = try await writer.write(operationID: operationID, record: .game(game), entityType: .game,
+                                              entityID: game.gameID, operation: .create, at: Timestamp(100))
+        XCTAssertEqual(first, repeated)
+        XCTAssertEqual(first.authorPlayerID, pair.playerTwoID)
+        accounts.account = third
+        do {
+            _ = try await writer.write(operationID: UUID(), record: .game(game), entityType: .game,
+                                       entityID: game.gameID, operation: .create, at: Timestamp(101))
+            XCTFail()
+        } catch SharingError.accountChanged { }
+        let shared = try await repository.revisions(in: .shared)
+        let owned = try await repository.revisions(in: .private)
+        XCTAssertEqual(shared.count, 2) // Writer enrollment plus one logical revision.
+        XCTAssertTrue(owned.isEmpty)
+        try await repository.close()
+    }
+
 }
 
 @MainActor
@@ -116,15 +151,23 @@ private final class ShareDouble: PairShareTransport {
     func invite(recipient: CloudAccount, share: PairShare) async throws -> PairShare {
         if fail { throw Failure.temporary }
         invitations += 1
+        if !value.members.contains(where: { $0.account == recipient }) {
+            replaceMembers(value.members + [ShareMember(account: recipient, role: .privateParticipant, acceptance: .pending, canWrite: true)])
+        }
         return value
     }
     func cancelPending(share: PairShare) async throws -> PairShare {
         if fail { throw Failure.temporary }
         cancellations += 1
+        replaceMembers(value.members.filter { $0.role == .owner })
         return value
     }
     func accept(url: URL, account: CloudAccount) async throws -> PairShare? {
         if fail { throw Failure.temporary }
         return awaitingImport ? nil : value
+    }
+    private func replaceMembers(_ members: [ShareMember]) {
+        value = PairShare(identifier: value.identifier, containerIdentifier: value.containerIdentifier,
+                          pairID: value.pairID, route: value.route, isPublic: value.isPublic, members: members, url: value.url)
     }
 }
