@@ -1,6 +1,6 @@
 import Foundation
 
-struct CloudAccount: Equatable, Sendable {
+struct CloudAccount: Hashable, Sendable {
     let recordName: String
 }
 
