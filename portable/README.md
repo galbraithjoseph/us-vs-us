@@ -57,7 +57,7 @@ A completion service only completes an in-progress match. Corrections use a new 
 
 ## Operations, dependencies, and conflicts
 
-The full revision graph is authoritative; these rules are the contract for reconciliation in issue #5. The codec and direct-parent validators enforce structure, reference consistency, and immutable-field rules now; graph traversal, cycle detection, head selection, idempotent import, and totals are implemented in subsequent issues.
+The full revision graph is authoritative. The codec and direct-parent validators enforce structure, reference consistency, and immutable-field rules. The implemented [reconciliation layer](../iOS/Documentation/Reconciliation.md) provides graph traversal, cycle detection, head selection, idempotent import, dependency filtering, and totals.
 
 - **Pair setup:** generate a pair, two players, and the first enrolled device with distinct application IDs, then emit their create snapshots. The bootstrap graph contains mutually dependent references. Persist structurally valid revisions and defer semantic application until the complete pair/player/device dependency set is available. A missing dependency is a typed pending condition, not a valid projection or a reason to erase history.
 - **Pair updates:** player slots and creation time are immutable. The current schema permits an identical update/resolution snapshot, not membership or ownership transfer.
@@ -70,7 +70,7 @@ The full revision graph is authoritative; these rules are the contract for recon
 - **Dependent metadata:** missing, unsupported, voided, or conflicted pair/player/game metadata keeps dependent matches pending/excluded from totals until usable dependencies are available. This conservative rule includes display-name-only conflicts. An unconflicted archived game remains usable for existing history. Historical enrollment snapshots validate old writer references independently of current device availability.
 - **Totals:** count each distinct, completed, non-voided, non-conflicted, fully validated match once. Draws increment draws and neither player's wins. Projections and totals are local/rebuildable; the codec does not cache or calculate them.
 
-Do not assume receiving sequence N means earlier sequences arrived. Storage/import will retain gaps, reserve sequences durably, and preserve original identities through retries. Parent ordering is canonical encoding only; it gives no head priority.
+Do not assume receiving sequence N means earlier sequences arrived. Storage/import retain gaps, reserve sequences durably, and preserve original identities through retries. Parent ordering is canonical encoding only; it gives no head priority.
 
 ## Fixtures and tests
 

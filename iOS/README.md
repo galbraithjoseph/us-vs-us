@@ -1,6 +1,6 @@
 # Us vs Us for iOS
 
-Open `UsVsUs.xcodeproj` and select the checked-in **UsVsUs** shared scheme. The current shell has Home and Settings screens, a locally saved setup-help preference, and deterministic unit/UI test entry points. The domain schema and Core Data repositories are implemented beneath the shell; pairing, feature screens, and CloudKit sharing remain tracked work. See [storage and crash recovery](Documentation/Persistence.md) and the [portable schema](../portable/README.md).
+Open `UsVsUs.xcodeproj` and select the checked-in **UsVsUs** shared scheme. The current shell has Home and Settings screens, a locally saved setup-help preference, and deterministic unit/UI test entry points. The domain schema, Core Data repositories, and [rebuildable reconciliation](Documentation/Reconciliation.md) are implemented beneath the shell; pairing, feature screens, and CloudKit sharing remain tracked work. See [storage and crash recovery](Documentation/Persistence.md) and the [portable schema](../portable/README.md).
 
 ## Supported environment
 
